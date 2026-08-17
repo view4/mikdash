@@ -1,0 +1,16 @@
+{
+    "name": "@mikdash/api",
+    "private": true,
+    "version": "0.0.1",
+    "description": "API for Mikdash",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/index.js"
+    },
+    "dependencies": {
+        "@mikdash/data-storage": "workspace:*",
+        "@mikdash/feature": "workspace:*",
+        "@mikdash/server": "workspace:*"
+    }
+}

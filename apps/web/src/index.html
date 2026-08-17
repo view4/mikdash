@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mikdash</title>
+    <script type="importmap">
+            {
+                "imports": {
+                    "@mikdash/state": "/packages/state/src/index.js",
+                    "@mikdash/components": "/packages/components/src/index.js"
+                }
+            }
+        </script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #button {
+            padding: 1rem 3rem;
+            color: white;
+            font-weight: 600;
+            background: grey;
+            border-radius: 1rem;
+        }
+
+        @media (max-width: 600px) {}
+    </style>
+    <style id="kadesh-styling" type="text/css">
+        #kadesh-page-container {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        #kadesh-container {
+            height: 50%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #kadesh-input {
+            width: 72%;
+            border-radius: 2rem;
+            border: 2px solid #80808080;
+            height: 3rem;
+            padding: 0 1rem;
+            outline: none;
+
+            /* when active give electric blue border */
+            &:focus,
+            &:active,
+            &:hover,
+            &:focus-visible {
+                border: 2px solid lightblue;
+                box-shadow: 0.25rem 0.25rem 0.25rem rgba(173, 216, 230, 0.5);
+            }
+        }
+
+        #submit-button {
+            position: absolute;
+            bottom: 5rem;
+            right: 5rem;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            border: 2px double #80808080;
+            background: white;
+            font-weight: 600;
+            letter-spacing: 0.25rem;
+            font-size: 18px;
+            color: black;
+            cursor: pointer;
+
+            &:hover,
+            &:active,
+            &:focus,
+            &:focus-visible {
+                border: 2px solid lightblue;
+                box-shadow: 0.1rem 0.1rem 0.1rem rgba(173, 216, 230, 0.5);
+            }
+        }
+
+        #toggle-list-button {
+            position: absolute;
+            top: 3rem;
+            left: 3rem;
+            border-radius: 2rem;
+            border: 2px double lightblue;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 3rem;
+            width: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 18;
+
+            &:hover,
+            &:active,
+            &:focus,
+            &:focus-visible {
+                border: 2px solid lightblue;
+                box-shadow: 0.25rem 0.25rem 0.25rem rgba(173, 216, 230, 0.5);
+            }
+        }
+
+        #toggle-list-button.closed:hover span {
+            border-bottom: 2px solid lightblue;
+        }
+
+        #toggle-list-button.closed #close-kadesh-list-button-lines {
+            display: none;
+        }
+
+        #toggle-list-button.open #open-kadesh-list-button-lines {
+            display: none;
+        }
+
+        #toggle-list-button.closed span {
+            width: 0.75rem;
+            height: 0.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid grey;
+        }
+
+        #toggle-list-button.open span {
+            width: 0.75rem;
+            height: 0.1rem;
+            color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #kadesh-feed-container {
+            position: absolute;
+            z-index: 10;
+            height: 75vh;
+            width: 75vw;
+            top: 12.5vh;
+            left: 12.5vw;
+            background: white;
+            border-radius: 1rem;
+            padding: 1vw;
+            overflow-y: auto;
+            border: 2px solid lightblue;
+            box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+        }
+
+        #kadesh-feed-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 2px solid lightblue;
+            box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.1rem;
+            color: black;
+            /* text-align: center; */
+            text-wrap: wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        @media (max-width: 600px) {
+            #kadesh-container {
+                flex-direction: row-reverse;
+                align-items: flex-start;
+                justify-content: space-around;
+                padding: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            #kadesh-input {
+                /* width: 50%; */
+            }
+
+            #toggle-list-button {
+                position: absolute;
+                top: unset;
+                bottom: 3rem;
+                left: 2rem;
+                height: 3rem;
+            }
+
+            #submit-button {
+                bottom: 3rem;
+                right: 2rem;
+                height: 3rem;
+                padding: unset;
+                width: 10rem;
+            }
+
+
+
+        }
+    </style>
+    <style id="korech-styling" type="text/css">
+
+        #kadesh-header-container {
+            position: absolute;
+            top: 0rem;
+            left: 0rem;
+            width: 100%;
+            height: 5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid lightgrey;    
+        }
+
+        #kadesh-header {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.1rem;
+            color: black;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        #altar-container > div {
+            border: 1px solid lightgrey;
+        }
+
+        #altar-container  textarea {
+            grid-area: center;
+            height: 100%;
+            width: 100%;
+            outline: none;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.05rem;
+            color: black;
+            resize: none;
+            overflow: scroll;
+            padding: 0;
+        }
+
+        #back-button-container {
+            position: absolute;
+            top: 6rem;
+            left: 1rem;
+        }
+
+        #back-button {
+            cursor: pointer;
+            z-index: 4;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            border: 2px solid white;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.05rem;
+            color: black;
+            cursor: pointer;
+            background: white;
+            border: 2px solid rgba(173, 216, 230, 0.25);
+
+        }
+
+        #back-button:hover, #back-button:active, #back-button:focus, #back-button:focus-visible {
+            border: 2px solid rgba(173, 216, 230, 0.5);
+            box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+        }
+
+        #save-button-container {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+        }
+
+        #save-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            border: 2px solid rgba(173, 216, 230, 0.5);
+            color: black;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 0.05rem;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #save-button:hover, #save-button:active, #save-button:focus, #save-button:focus-visible {
+            border: 2px solid lightblue;
+            box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            #altar-container {
+                max-width: 90vw;
+            }
+
+            #back-button-container {
+                top: unset;
+                bottom: 1rem;
+                left: 0.5rem;
+                height: 2rem;
+            }
+
+            #kadesh-header {
+                max-width: 72%;
+                max-height: 90%;
+                overflow: scroll;
+                font-size: 18px;
+            }
+
+        }
+
+        @media (max-height: 400px) {
+
+            #altar-container {
+                max-height: 54vh;
+                /* width: 75vw;
+                top: 12.5vh;
+                left: 12.5vw; */
+            }
+
+            #back-button-container {
+                top: unset;
+                bottom: 1rem;
+                left: 0.5rem;
+                height: 2rem;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div id="root" />
+</body>
+<!-- <script type="module" src="./example.js"></script> -->
+
+<script type="module" src="./middleware.js"></script>
+<script type="module" src="./index.js"></script>
+<script type="module" src="./kadesh.js"> </script>
+<script type="module" src="./korech.js"> </script>
+
+</html>

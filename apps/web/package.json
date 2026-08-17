@@ -1,0 +1,16 @@
+{
+    "name": "@mikdash/web",
+    "private": true,
+    "version": "0.0.1",
+    "description": "Web app for Mikdash",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/server.js"
+    },
+    "dependencies": {
+        "@mikdash/components": "workspace:*",
+        "@mikdash/server": "workspace:*",
+        "@mikdash/state": "workspace:*"
+    }
+}

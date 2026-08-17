@@ -1,0 +1,11 @@
+{
+    "name": "@mikdash/components",
+    "private": true,
+    "version": "0.0.1",
+    "description": "Reusable components for Mikdash",
+    "main": "index.js",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.js"
+    }
+}

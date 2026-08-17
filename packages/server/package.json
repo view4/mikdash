@@ -1,0 +1,14 @@
+{
+    "name": "@mikdash/server",
+    "private": true,
+    "version": "0.0.1",
+    "description": "Server for Mikdash",
+    "main": "index.js",
+    "type": "module",
+    "dependencies": {
+        "@mikdash/data-storage": "workspace:*"
+    },
+    "exports": {
+        ".": "./src/index.js"
+    }
+}

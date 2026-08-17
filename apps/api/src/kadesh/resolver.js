@@ -6,9 +6,11 @@ const store = new Kadesh();
 export const kadeshHandler = new KeyRouteHandler({
     resolvers: {
         write: (payload) => store.write(payload),
-        read: async () => {
+        read: async (payload) => {
             // to accept args for searching here....
-            const res = await store.list();
+            const res = await store.list({
+                search: payload.search
+            });
             return res ;
         }
     }

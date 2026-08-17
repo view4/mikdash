@@ -47,7 +47,7 @@
             justify-content: center;
         }
 
-        #kadesh-input {
+        #kadesh-input, #kadesh-search-input {
             width: 72%;
             border-radius: 2rem;
             border: 2px solid #80808080;
@@ -63,6 +63,22 @@
                 border: 2px solid lightblue;
                 box-shadow: 0.25rem 0.25rem 0.25rem rgba(173, 216, 230, 0.5);
             }
+        }
+
+        #kadesh-search-input-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem;
+            position: sticky;
+            height: 10%;
+        }
+
+        #kadesh-feed-items-container {
+            margin-top: 3rem;
+            height: 90%;
+            overflow-y: auto;
         }
 
         #submit-button {
@@ -154,7 +170,7 @@
             background: white;
             border-radius: 1rem;
             padding: 1vw;
-            overflow-y: auto;
+            overflow: hidden;
             border: 2px solid lightblue;
             box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
         }
@@ -174,7 +190,38 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
+            cursor: pointer;
         }
+
+        #kadesh-feed-items-container .active-service-status {
+            height: 0.5rem;
+            width: 0.5rem;
+            border-radius: 100%;
+            border-width: 0.25rem;
+            border-color: #4169e180;
+            border-style: double;
+        }
+
+        #kadesh-feed-items-container .pending-clearance-service-status {
+            height: 0.5rem;
+            width: 0.5rem;
+            border-radius: 100%;
+            border-width: 0.25rem;
+            border-color: #add8e680;
+            border-style: double;
+        }
+
+        #kadesh-feed-items-container .clear-service-status {
+            height: 0.5rem;
+            width: 0.5rem;
+            border-radius: 100%;
+            border-width: 0.25rem;
+            border-color: #b0c4de80;
+            border-style: double;
+        }
+
+
+
 
         @media (max-width: 600px) {
             #kadesh-container {

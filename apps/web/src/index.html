@@ -47,7 +47,8 @@
             justify-content: center;
         }
 
-        #kadesh-input, #kadesh-search-input {
+        #kadesh-input,
+        #kadesh-search-input {
             width: 72%;
             border-radius: 2rem;
             border: 2px solid #80808080;
@@ -185,7 +186,7 @@
             font-weight: 600;
             letter-spacing: 0.1rem;
             color: black;
-            /* text-align: center; */
+            position: relative;
             text-wrap: wrap;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -193,35 +194,34 @@
             cursor: pointer;
         }
 
-        #kadesh-feed-items-container .active-service-status {
+        #kadesh-feed-items-container .service-status {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
             height: 0.5rem;
             width: 0.5rem;
             border-radius: 100%;
             border-width: 0.25rem;
-            border-color: #4169e180;
             border-style: double;
         }
 
-        #kadesh-feed-items-container .pending-clearance-service-status {
-            height: 0.5rem;
-            width: 0.5rem;
-            border-radius: 100%;
-            border-width: 0.25rem;
-            border-color: #add8e680;
-            border-style: double;
+        #kadesh-feed-items-container .service-status.active {
+            border-color: #4169e1bf;
+            box-shadow: 0 0 0 0.1rem #4169e180,
+                0 0 0 0.2rem #4169e180;
         }
 
-        #kadesh-feed-items-container .clear-service-status {
-            height: 0.5rem;
-            width: 0.5rem;
-            border-radius: 100%;
-            border-width: 0.25rem;
-            border-color: #b0c4de80;
-            border-style: double;
+        #kadesh-feed-items-container .service-status.pending-clearance {
+            border-color: #add8e6bf;
+            box-shadow: 0 0 0 0.1rem #add8e680,
+                0 0 0 0.2rem #add8e680;
         }
 
-
-
+        #kadesh-feed-items-container .service-status.clear {
+            border-color: #b0c4debf;
+            box-shadow: 0 0 0 0.1rem #b0c4de80,
+                0 0 0 0.2rem #b0c4de80;
+        }
 
         @media (max-width: 600px) {
             #kadesh-container {
@@ -230,10 +230,6 @@
                 justify-content: space-around;
                 padding: 0.5rem;
                 margin-top: 1rem;
-            }
-
-            #kadesh-input {
-                /* width: 50%; */
             }
 
             #toggle-list-button {
@@ -257,7 +253,6 @@
         }
     </style>
     <style id="korech-styling" type="text/css">
-
         #kadesh-header-container {
             position: absolute;
             top: 0rem;
@@ -267,7 +262,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-bottom: 1px solid lightgrey;    
+            border-bottom: 1px solid lightgrey;
         }
 
         #kadesh-header {
@@ -279,11 +274,11 @@
             max-width: 90%;
         }
 
-        #altar-container > div {
+        #altar-container>div {
             border: 1px solid lightgrey;
         }
 
-        #altar-container  textarea {
+        #altar-container textarea {
             grid-area: center;
             height: 100%;
             width: 100%;
@@ -321,7 +316,10 @@
 
         }
 
-        #back-button:hover, #back-button:active, #back-button:focus, #back-button:focus-visible {
+        #back-button:hover,
+        #back-button:active,
+        #back-button:focus,
+        #back-button:focus-visible {
             border: 2px solid rgba(173, 216, 230, 0.5);
             box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
         }
@@ -346,7 +344,10 @@
             transition: all 0.3s ease-in-out;
         }
 
-        #save-button:hover, #save-button:active, #save-button:focus, #save-button:focus-visible {
+        #save-button:hover,
+        #save-button:active,
+        #save-button:focus,
+        #save-button:focus-visible {
             border: 2px solid lightblue;
             box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
             font-size: 14px;
@@ -391,7 +392,6 @@
             }
 
         }
-
     </style>
 
 </head>

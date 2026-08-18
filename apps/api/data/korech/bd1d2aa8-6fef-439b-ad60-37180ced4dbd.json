@@ -1,9 +1,9 @@
 {
   "altar": {
-    "content": "again worship ",
+    "content": "",
     "sides": {
       "north": "",
-      "east": "",
+      "east": "again worship ",
       "south": "",
       "west": ""
     }
@@ -11,5 +11,5 @@
   "kadeshId": "004ee6e1-fec3-4f20-ac3d-d740208da20e",
   "id": "bd1d2aa8-6fef-439b-ad60-37180ced4dbd",
   "createdAt": "2026-08-17T13:34:39.069Z",
-  "updatedAt": "2026-08-17T13:40:16.617Z"
+  "updatedAt": "2026-08-18T07:52:43.572Z"
 }

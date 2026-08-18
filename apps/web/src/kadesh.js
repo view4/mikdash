@@ -33,11 +33,11 @@ const utilities = {
     getServiceStatusClassName: (status) => {
         switch (status) {
             case SERVICE_STATUSES.ACTIVE:
-                return "active-service-status";
+                return "active";
             case SERVICE_STATUSES.PENDING_CLEARANCE:
-                return "pending-clearance-service-status";
+                return "pending-clearance";
         }
-        return "clear-service-status";
+        return "clear";
     }
 }
 
@@ -127,7 +127,7 @@ const renderListView = () => {
                     seed("div", {
                         children: [
                             seed("div", {
-                                className: utilities.getServiceStatusClassName(kadesh.metadata.serviceStatus),
+                                className: `service-status ${utilities.getServiceStatusClassName(kadesh?.metadata?.serviceStatus)}`,
                             }),
                         ],
                     })

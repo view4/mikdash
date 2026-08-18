@@ -10,7 +10,6 @@ const SERVICE_STATUSES = {
 const backend = " http://localhost:3000/api/";
 
 const requests = {
-    // allow for search input here please. 
     fetch: async (payload) => {
         const res = await fetch(backend, {
             method: "POST", body: JSON.stringify({
@@ -27,6 +26,18 @@ const requests = {
             { method: "POST", body: JSON.stringify({ route: "kadesh", action: "write", payload: { kadesh } }) });
         const body = await res.json();
         return body;
+    }
+}
+
+const utilities = {
+    getServiceStatusClassName: (status) => {
+        switch (status) {
+            case SERVICE_STATUSES.ACTIVE:
+                return "active-service-status";
+            case SERVICE_STATUSES.PENDING_CLEARANCE:
+                return "pending-clearance-service-status";
+        }
+        return "clear-service-status";
     }
 }
 
@@ -47,12 +58,8 @@ const handleSubmit = () => {
             }
         })
 
-        // await Korech.render();
-
         const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: res.id } });
         document.dispatchEvent(event);
-
-        // todo: handle success here... e.g. navigate to page, display message or something... 
     }).catch((err) => {
         console.log("error....")
         console.log(err)
@@ -83,7 +90,10 @@ const renderListView = () => {
             // add a manual throttle here please...
             const search = e.target.value;
             const res = await fetchKadeshEntries({ search });
-            document.getElementById("kadesh-feed-items-container").innerHTML = ""; //TODO: better way?
+            const container = document.getElementById("kadesh-feed-items-container");
+            while (container.lastChild) {
+                container.removeChild(container.lastChild);
+            }
             mutation((state) => {
                 state.kadesh = {
                     showList: true,
@@ -102,8 +112,6 @@ const renderListView = () => {
 
     const renderList = (feed) => {
         feed.forEach(kadesh => {
-            const status = kadesh.metadata?.serviceStatus;
-            // SERVICE_STATUSES.PENDING_CLEARANCE;
 
             const kadeshContainer = seed("div", {
                 id: "kadesh-feed-item",
@@ -119,8 +127,7 @@ const renderListView = () => {
                     seed("div", {
                         children: [
                             seed("div", {
-                                className: status == SERVICE_STATUSES.ACTIVE ? "active-service-status" : status == SERVICE_STATUSES.PENDING_CLEARANCE ? "pending-clearance-service-status" : "clear-service-status",
-
+                                className: utilities.getServiceStatusClassName(kadesh.metadata.serviceStatus),
                             }),
                         ],
                     })
@@ -133,10 +140,8 @@ const renderListView = () => {
                             id: kadesh.id,
                         }
                     })
-                    // emit a synthatic event called "kadesh-selected" with the kadesh id as the payload
                     const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: kadesh.id } });
                     document.dispatchEvent(event);
-                    // await Korech.render();
                 }
             })
         });
@@ -241,7 +246,6 @@ document.addEventListener("to-kadesh", () => {
         root.removeChild(korechPageContainer);
     }
 
-    // const kadeshContainer = document.getElementById("kadesh-container");
     if (container) {
         root.appendChild(container);
     }

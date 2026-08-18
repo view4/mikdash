@@ -9,16 +9,8 @@ const kadeshStore = new Kadesh();
 export const korechHandler = new KeyRouteHandler({
     resolvers: {
         write: async (payload) => {
-            let res;
-            if (!payload.id) res = await store.write(payload);
-            res = await store.update(payload.id, payload);
-            const serviceStatus = calculateServiceStatus(payload)
-            kadeshStore.update(payload.kadeshId, {
-                metadata: {
-                    serviceStatus: serviceStatus.serviceStatus,
-                    lastServiceAt: serviceStatus.lastServiceAt
-                }
-            })
+            const res = await store.write(payload);
+            await kadeshStore.updateMetadata(payload.kadeshId, calculateServiceStatus(payload));
             return res;
         },
         read: async (payload) => {

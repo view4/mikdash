@@ -21,8 +21,18 @@ export class Kadesh extends Document {
     async list(payload) {
         const { search } = payload;
         const res = await super.list();
-        // check contains and logic for string search
         if (search?.trim()?.length) return res.filter(entity => entity.kadesh.toLowerCase().includes(search.toLowerCase()))
         return res
+    }
+
+    async updateMetadata(id, payload) {
+        const kadesh = await this.get(id);
+        if (!kadesh) throw new Error("Kadesh not found");
+        return this.update(id, {
+            metadata: {
+                ...kadesh.metadata,
+                ...payload
+            }
+        });
     }
 }

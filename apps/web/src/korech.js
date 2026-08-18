@@ -58,8 +58,6 @@ const hideSave = () => {
 const onSave = () => {
     const korech = receptor("korech");
     requests.write(korech).then((res) => {
-        console.log("res..")
-        console.log(res)
         if (res.id) {
             hideSave();
         } else {

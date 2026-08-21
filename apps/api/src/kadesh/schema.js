@@ -9,8 +9,30 @@ export class Kadesh extends Document {
         super({
             dir: path.join(__dirname, "../..", "data", "kadesh"),
             shape: {
-                "kadesh": "string"
+                "kadesh": "string",
+                "metadata": {
+                    "serviceStatus": "string",
+                    "lastServiceAt": "string"
+                }
             }
         })
+    }
+
+    async list(payload) {
+        const { search } = payload;
+        const res = await super.list();
+        if (search?.trim()?.length) return res.filter(entity => entity.kadesh.toLowerCase().includes(search.toLowerCase()))
+        return res
+    }
+
+    async updateMetadata(id, payload) {
+        const kadesh = await this.get(id);
+        if (!kadesh) throw new Error("Kadesh not found");
+        return this.update(id, {
+            metadata: {
+                ...kadesh.metadata,
+                ...payload
+            }
+        });
     }
 }

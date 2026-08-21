@@ -1,12 +1,23 @@
 import { seed } from "@mikdash/components";
 import { mutation, receptor } from "@mikdash/state";
 
+const SERVICE_STATUSES = {
+    ACTIVE: "ACTIVE",
+    CLEAR: "CLEAR",
+    PENDING_CLEARANCE: "PENDING-CLEARANCE"
+};
 
 const backend = " http://localhost:3000/api/";
 
 const requests = {
-    fetch: async () => {
-        const res = await fetch(backend, { method: "POST", body: JSON.stringify({ route: "kadesh", action: "read", payload: {} }) })
+    fetch: async (payload) => {
+        const res = await fetch(backend, {
+            method: "POST", body: JSON.stringify({
+                route: "kadesh", action: "read", payload: {
+                    search: payload?.search?.trim()
+                }
+            })
+        })
         const body = await res.json();
         return body;
     },
@@ -18,10 +29,22 @@ const requests = {
     }
 }
 
+const utilities = {
+    getServiceStatusClassName: (status) => {
+        switch (status) {
+            case SERVICE_STATUSES.ACTIVE:
+                return "active";
+            case SERVICE_STATUSES.PENDING_CLEARANCE:
+                return "pending-clearance";
+        }
+        return "clear";
+    }
+}
+
 const root = document.getElementById("root");
 
-const fetchKadeshEntries = async () => {
-    return await requests.fetch();
+const fetchKadeshEntries = async (payload) => {
+    return await requests.fetch(payload);
 };
 
 
@@ -35,50 +58,97 @@ const handleSubmit = () => {
             }
         })
 
-        // await Korech.render();
-
         const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: res.id } });
         document.dispatchEvent(event);
-
-        // todo: handle success here... e.g. navigate to page, display message or something... 
     }).catch((err) => {
         console.log("error....")
         console.log(err)
     })
 };
 
-const renderList = () => {
+const renderListView = () => {
     const feed = receptor("kadesh.feed");
     const feedContainer = seed("div", {
         id: "kadesh-feed-container",
         parent: kadeshContainer
     })
 
+    const kadeshSearchInputContainer = seed("div", {
+        id: "kadesh-search-input-container",
+        parent: feedContainer,
+    })
 
-    feed.forEach(kadesh => {
-        const kadeshContainer = seed("div", {
-            id: "kadesh-feed-item",
-            parent: feedContainer,
-            children: [
-                seed("p", {
-                    text: kadesh.kadesh,
-                })
-            ],
-            onclick: async () => {
-                mutation((state) => {
-                    state.kadesh = {
-                        ...state.kadesh,
-                        kadesh: kadesh.kadesh,
-                        id: kadesh.id,
-                    }
-                })
-                // emit a synthatic event called "kadesh-selected" with the kadesh id as the payload
-                const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: kadesh.id } });
-                document.dispatchEvent(event);
-                // await Korech.render();
+    const kadeshSearchInput = seed("input", {
+        id: "kadesh-search-input",
+        parent: kadeshSearchInputContainer,
+        type: "text",
+        attributes: {
+            placeholder: "Search",
+            type: "text"
+        },
+        onkeyup: async (e) => {
+            // add a manual throttle here please...
+            const search = e.target.value;
+            const res = await fetchKadeshEntries({ search });
+            const container = document.getElementById("kadesh-feed-items-container");
+            while (container.lastChild) {
+                container.removeChild(container.lastChild);
             }
-        })
+            mutation((state) => {
+                state.kadesh = {
+                    showList: true,
+                    feed: res
+                }
+            })
+
+            renderList(res)
+        }
     });
+
+    const feedItemsContainer = seed("div", {
+        id: "kadesh-feed-items-container",
+        parent: feedContainer,
+    })
+
+    const renderList = (feed) => {
+        feed.forEach(kadesh => {
+
+            const kadeshContainer = seed("div", {
+                id: "kadesh-feed-item",
+                parent: feedItemsContainer,
+                children: [
+                    seed("div", {
+                        children: [
+                            seed("p", {
+                                text: kadesh.kadesh,
+                            }),
+                        ]
+                    }),
+                    seed("div", {
+                        children: [
+                            seed("div", {
+                                className: `service-status ${utilities.getServiceStatusClassName(kadesh?.metadata?.serviceStatus)}`,
+                            }),
+                        ],
+                    })
+                ],
+                onclick: async () => {
+                    mutation((state) => {
+                        state.kadesh = {
+                            ...state.kadesh,
+                            kadesh: kadesh.kadesh,
+                            id: kadesh.id,
+                        }
+                    })
+                    const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: kadesh.id } });
+                    document.dispatchEvent(event);
+                }
+            })
+        });
+    }
+
+    renderList(feed)
+
     return feedContainer;
 }
 
@@ -87,7 +157,7 @@ const handleToggleListView = () => {
     const showList = !displayingList;
 
     if (showList) {
-        renderList();
+        renderListView();
         toggleListButton.classList.remove("closed");
         toggleListButton.classList.add("open");
     } else {
@@ -176,7 +246,6 @@ document.addEventListener("to-kadesh", () => {
         root.removeChild(korechPageContainer);
     }
 
-    // const kadeshContainer = document.getElementById("kadesh-container");
     if (container) {
         root.appendChild(container);
     }

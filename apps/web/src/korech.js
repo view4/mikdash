@@ -9,7 +9,7 @@ const requests = {
         const body = await res.json();
         return body;
     },
-    create: async (korech) => {
+    write: async (korech) => {
         const res = await fetch(backend, { method: "POST", body: JSON.stringify({ route: "korech", action: "write", payload: { ...korech } }) })
         const body = await res.json();
         return body;
@@ -57,15 +57,15 @@ const hideSave = () => {
 
 const onSave = () => {
     const korech = receptor("korech");
-    requests.create(korech).then((res) => {
-        if(res.id) {
+    requests.write(korech).then((res) => {
+        if (res.id) {
             hideSave();
         } else {
             alert("Failed to save correctly?");
         }
     });
 
-    
+
 
 
 };
@@ -74,7 +74,7 @@ const onBack = () => {
     mutation((state) => {
         state.korech = null;
     });
-    const event = new CustomEvent("to-kadesh", { detail: { } });
+    const event = new CustomEvent("to-kadesh", { detail: {} });
     document.dispatchEvent(event);
 }
 
@@ -352,7 +352,7 @@ const saveButton = seed("button", {
     parent: saveButtonContainer,
     text: "Save",
     onclick: () => {
-        onSave();   
+        onSave();
     },
 
 });
@@ -389,7 +389,7 @@ const setKadeshHeaderText = () => {
 
 const Korech = {
     render: (kadeshId) => {
-        
+
         fetchOnLoad(kadeshId).then((res) => {
             setAltarValues();
             setKadeshHeaderText();
@@ -397,7 +397,7 @@ const Korech = {
         const kadeshContainer = document.getElementById("kadesh-page-container");
         kadeshContainer.remove();
         root.appendChild(container);
-        
+
     }
 }
 

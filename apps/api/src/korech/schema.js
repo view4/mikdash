@@ -22,4 +22,9 @@ export class Korech extends Document {
             }
         })
     }
+
+    async write(payload) {
+        if (!payload.id) return super.write(payload);
+        return super.update(payload.id, payload);
+    }
 }

@@ -27,7 +27,9 @@ export const seed = (tag, { id, onclick, text, className, attributes = {}, child
     }
 
     if (className) {
-        element.classList.add(className)
+        className.split(" ").forEach(className => {
+            element.classList.add(className)
+        })
     }
 
     if (onclick) {

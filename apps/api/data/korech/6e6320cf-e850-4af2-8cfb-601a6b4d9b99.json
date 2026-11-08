@@ -1,0 +1,15 @@
+{
+  "altar": {
+    "content": "",
+    "sides": {
+      "north": "",
+      "east": "",
+      "south": "",
+      "west": ""
+    }
+  },
+  "kadeshId": "0effcec3-07a1-4685-b0ef-9ffea7f5c9aa",
+  "id": "6e6320cf-e850-4af2-8cfb-601a6b4d9b99",
+  "createdAt": "2026-10-23T06:48:43.307Z",
+  "updatedAt": "2026-10-23T06:48:43.307Z"
+}

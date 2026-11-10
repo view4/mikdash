@@ -58,7 +58,7 @@ const handleSubmit = () => {
             }
         })
 
-        const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: res.id } });
+        const event = new CustomEvent("kadesh-entered", { detail: { kadeshId: res.id } });
         document.dispatchEvent(event);
     }).catch((err) => {
         console.log("error....")
@@ -140,7 +140,7 @@ const renderListView = () => {
                             id: kadesh.id,
                         }
                     })
-                    const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: kadesh.id } });
+                    const event = new CustomEvent("kadesh-entered", { detail: { kadeshId: kadesh.id } });
                     document.dispatchEvent(event);
                 }
             })

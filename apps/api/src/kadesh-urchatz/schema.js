@@ -1,6 +1,8 @@
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { Document } from "@mikdash/data-storage";
+import { promises as fs } from "fs";
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,21 +28,12 @@ export class KadeshUrchatz extends Document {
     }
 
     async write(data) {
-        const kadeshId = data.kadeshId;
-        const id = data.id ?? crypto.randomUUID();
-        const now = new Date().toISOString();
-        const doc = {
-            ...data,
-            id,
-            createdAt: data.createdAt ?? now,
-            updatedAt: data.updatedAt ?? now,
-        };
-        const filePath = this._filePath(kadeshId);
-        await fs.writeFile(filePath, JSON.stringify(doc, null, 2), "utf-8");
-        return doc;
+        if (!data.entryId) return this.create(data)
+        if (data.entryId) return this.update(data);
     }
 
     async generate(kadeshId, data) {
+        console.log("data, ..",data)
         const filePath = this._filePath(kadeshId);
         const document = {
             id: crypto.randomUUID(),
@@ -49,7 +42,7 @@ export class KadeshUrchatz extends Document {
                 {
                     urchatz: data.urchatz,
                     entryId: crypto.randomUUID(),
-                    direction: data.directon
+                    direction: data.direction
                 }
             ]
         }
@@ -59,17 +52,19 @@ export class KadeshUrchatz extends Document {
 
 
     async create(data) {
+        console.log("create...", data)
         const kadeshId = data.kadeshId;
         const existingFile = await this.read(kadeshId);
-        if (!existingFile) return generate(kadeshId, data);
+        if (!existingFile) return this.generate(kadeshId, data);
         const document = {
-            ...existingFile, 
+            ...existingFile,
             entries: [
                 ...existingFile.entries,
                 {
                     urchatz: data.urchatz,
                     entryId: crypto.randomUUID(),
-                    direction: data.directon
+                    direction: data.direction,
+                    createdAt: new Date().toISOString()
                 }
             ]
         };

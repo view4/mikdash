@@ -401,7 +401,7 @@ const Korech = {
     }
 }
 
-document.addEventListener("kadesh-selected", (event) => {
+document.addEventListener("rachtzah-entered", (event) => {
     const kadeshId = event.detail.kadeshId;
     Korech.render(kadeshId);
 });

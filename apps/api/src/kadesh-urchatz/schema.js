@@ -23,7 +23,13 @@ export class KadeshUrchatz extends Document {
                                 "side": "string"
                             }
                         ],
-                        "yachatz": ["string"],
+                        "yachatz": [
+                            {
+                                "yachatz": "string",
+                                "details": ["string"],
+                                "side": "string"
+                            }
+                        ],
                         "maggid": "string",
                         "rachtzah": "string",
                         "id": "string"
@@ -34,8 +40,6 @@ export class KadeshUrchatz extends Document {
     }
 
     async write(data) {
-        console.log("inside write..")
-        console.log(data)
         if (!data.entryId) return this.create(data)
         if (data.entryId) return this.update(data);
     }
@@ -92,9 +96,9 @@ export class KadeshUrchatz extends Document {
 
         const document = await this.read(kadeshId);
 
-        if (!document || !document?.entries?.length)  {
+        if (!document || !document?.entries?.length) {
             console.log("something here... ")
-            
+
         };
 
         let existingEntryIndex = null;

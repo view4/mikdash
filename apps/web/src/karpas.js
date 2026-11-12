@@ -24,6 +24,41 @@ const requests = {
 
 const root = document.getElementById("root");
 
+const tabs = (items, onChange, style = {}) => {
+    const container = seed("div", {
+        children: items.map((item, index) => seed("button", {
+            text: item.text,
+            onclick: (e) => onChange(item, index, e),
+            style: {
+                background: item.active ? "#ed143d80" : "white",
+                border: "none",
+                fontWeight: item.active ? "bold" : "normal",
+                cursor: "pointer"
+            }
+        })),
+        style: {
+            border: "1px solid lightgrey",
+            display: "flex"
+        }
+    })
+    return container
+}
+
+const generateTabs = (side) => {
+    return tabs(
+        [{ text: "karpas", active: true }, { text: "yachatz", }],
+        (item) => {
+            const event = new CustomEvent("toggle-karpas-yachatz", {
+                detail: {
+                    value: item.text,
+                    side
+                }
+            });
+            document.dispatchEvent(event);
+        }
+    )
+}
+
 
 const generateAddKarpasEntity = (side) => {
     const container = seed("div", {
@@ -33,7 +68,7 @@ const generateAddKarpasEntity = (side) => {
                 {
                     style: {
                         cursor: "pointer",
-                        height: "5rem",
+                        height: "7rem",
                         width: "90%",
                         display: "flex",
                         alignItems: "center",
@@ -41,7 +76,8 @@ const generateAddKarpasEntity = (side) => {
                         border: "1px dashed #ed143d40",
                         margin: "0.5rem auto",
                         borderRadius: "0.5rem",
-                        background: "white"
+                        background: "white",
+                        marginBottom: "1rem"
                     },
                     text: "+",
                     onclick: () => {
@@ -51,9 +87,10 @@ const generateAddKarpasEntity = (side) => {
                 }
             )],
         style: {
-            height: "10%",
-
-
+            height: "18%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
         }
     });
     return container;
@@ -261,7 +298,8 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
                 style: {
                     background: "white",
                     borderRadius: "0.25rem",
-                    padding: "0.25rem 0.5rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
                     fontSize: "0.75rem",
                     border: "1px solid lightblue"
                 },
@@ -291,6 +329,18 @@ const renderKarpas = () => {
         document.getElementById("karpas-right-container"),
     ];
 
+    const [leftTabsContainer, rightTabsContainer] = [SIDES.LEFT, SIDES.RIGHT].map(side => (
+        seed("div", {
+            children: [generateTabs(side)],
+            style: {
+                height: "5rem",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+            }
+        })
+    ))
+
     const [leftAddContainer, rightAddContainer] = [
         generateAddKarpasEntity(SIDES.LEFT),
         generateAddKarpasEntity(SIDES.RIGHT)
@@ -307,7 +357,7 @@ const renderKarpas = () => {
             id: "karpas-left-inner-container",
             style: {
                 width: "100%",
-                maxHeight: "90%",
+                height: "72%",
                 display: "flex",
                 flexDirection: "column",
                 overflow: "scroll"
@@ -318,21 +368,28 @@ const renderKarpas = () => {
             id: "karpas-right-inner-container",
             style: {
                 width: "100%",
-                maxHeight: "90%",
+                height: "72%",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                overflow: "scroll",
+
             },
             children: rightExistingChildren,
         })
     ]
+    leftContainer.appendChild(leftTabsContainer);
     leftContainer.appendChild(leftInnerContainer);
     leftContainer.appendChild(leftAddContainer);
 
+    rightContainer.appendChild(rightTabsContainer);
     rightContainer.appendChild(rightInnerContainer);
     rightContainer.appendChild(rightAddContainer);
+
     Karpas.elements = {
+        leftTabsContainer,
         leftInnerContainer,
         leftAddContainer,
+        rightTabsContainer,
         rightInnerContainer,
         rightAddContainer
     }
@@ -361,8 +418,6 @@ const Karpas = {
     },
     reRender: (result) => {
         Object.values(Karpas.elements).map(element => element.remove())
-        // Karpas.elements.leftContainer.remove()
-        // Karpas.elements.rightContainer.remove()
         Karpas.render()
     },
     render: () => {
@@ -389,4 +444,16 @@ document.addEventListener("to-outer-courtyard", async (event) => {
 
     renderKarpas()
 
+})
+
+
+document.addEventListener("toggle-karpas-yachatz", (e) => {
+    const side = e.detail.side;
+    const value = e.detail.value;
+    console.log(e.detail)
+
+    if (value === "karpas" && document.getElementById(`karpas-${side}-container`).style.display === "none") {
+        document.getElementById(`yachatz-${side}-container`).style.display = "none"
+        document.getElementById(`karpas-${side}-container`).style.display = "block";
+    }
 })

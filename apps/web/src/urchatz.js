@@ -118,37 +118,53 @@ const renderOuterCourtyard = () => {
 
     const karpasContainers = [
         seed("div", {
-            parent: container,
+            // parent: container,
             // text: "left component",
             id: "karpas-left-container",
             style: {
                 height: "100%",
                 width: "20rem",
                 border: "1px solid #ed143d40",
-                overflow: "scroll"
+                overflow: "scroll",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
             }
         }),
         seed("div", {
-            parent: container,
+            // parent: container,
             id: "karpas-right-container",
             style: {
                 height: "100%",
                 width: "20rem",
                 border: "1px solid #ed143d40",
+                overflow: "scroll",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
             }
         }),
     ]
     const yachatzContainers = [
         seed("div", {
-            parent: container,
+            // parent: container,
+            id: "yachatz-left-container",
             style: {
-                display: "none"
+                display: "none",
+                height: "100%",
+                width: "20rem",
+                border: "1px solid lightblue",
+
             }
         }),
         seed("div", {
-            parent: container,
+            // parent: container,
+            id: "yachatz-right-container",
             style: {
-                display: "none"
+                display: "none",
+                height: "100%",
+                width: "20rem",
+                border: "1px solid lightblue",
             }
         })
     ]
@@ -160,7 +176,14 @@ const renderOuterCourtyard = () => {
         }
     });
 
-    container.insertBefore(maggidContainer, karpasContainers[1]);
+    [
+        karpasContainers[0],
+        yachatzContainers[0],
+        maggidContainer,
+        karpasContainers[1],
+        yachatzContainers[1]
+    ].map(element => container.appendChild(element))
+
 
     const event = new CustomEvent("to-outer-courtyard", {
         detail: {

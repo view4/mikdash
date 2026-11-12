@@ -38,7 +38,7 @@ const generateAddKarpasEntity = (side) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        border: "1px dashed rebeccapurple",
+                        border: "1px dashed #ed143d40",
                         margin: "0.5rem auto",
                         borderRadius: "0.5rem",
                         background: "white"
@@ -58,19 +58,22 @@ const generateAddKarpasEntity = (side) => {
     });
     return container;
 };
-const generateExistingKarpasEntities = (entities) => {
-    if (!entities) return [];
-    return entities.map((entity, index) => seed(
+
+const generateKarpasEntity = (entity, index) => {
+    const editEntityComponent = generateWriteKarpasEntity(entity.side, entity, index);
+    editEntityComponent.style.display = "none";
+    const component = seed(
         "div",
         {
             id: "",
             style: {
-                border: "1px solid rebeccapurple",
+                border: "1px solid #ed143d40",
                 borderRadius: "0.5rem",
                 margin: "0.5rem auto",
                 width: "90%",
                 maxHeight: "20rem",
                 overflow: "scroll",
+                minHeight: "7rem"
             },
             children: [
                 seed("div",
@@ -110,7 +113,11 @@ const generateExistingKarpasEntities = (entities) => {
                                 border: "1px solid lightblue"
 
                             },
-                            onclick: () => appendCreateKarpasEntity(entity.side, entity, index)
+                            onclick: () => {
+                                editEntityComponent.style.display = "block";
+                                component.style.display = "none"
+
+                            }
                         })
                     ],
                     style: {
@@ -121,15 +128,19 @@ const generateExistingKarpasEntities = (entities) => {
                 })
             ]
         }
-    ))
-
-
-}
-const handleEditEntity = () => {
+    )
+    return [editEntityComponent, component]
 
 }
+const generateExistingKarpasEntities = (entities) => {
+    if (!entities) return [];
+    return entities.reduce((children, entity, index) => ([
+        ...children,
+        ...generateKarpasEntity(entity, index)
+    ]), [])
+}
 
-const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) => {
+const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) => {
     // RENAME accordingly or create a singule kind of logic and handle accordingly please
     const state = {
         side,
@@ -153,13 +164,15 @@ const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) =
         children: [
             seed("input", {
                 id: "karpas-input-" + side,
-                value: karpasEntity?.karpas ?? "",
+                // value: 
                 onchange: (e) => {
                     state.karpas = e.target.value
                     console.log('handle on change here...')
                 },
                 attributes: {
-                    placeholder: "Established Practice"
+                    placeholder: "Established Practice",
+                    value: karpasEntity?.karpas ?? "",
+
                 }
             })
         ],
@@ -181,14 +194,16 @@ const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) =
                         "input",
                         {
                             id: "karpas-detail-input-" + (index + 1),
-                            value: detail,
+                            // value: detail,
                             onchange: (e) => {
                                 state.details[index] = e.target.value
                                 console.log("handle onblur here...! ")
+                                if (!e.target.value.length) return null;
                                 e.target.parentElement.parentElement.appendChild(generateDetailInputItem("", index + 1))
                             },
                             attributes: {
                                 placeholder: "Detail",
+                                value: detail ?? ""
                             },
                         }
                     )
@@ -226,23 +241,21 @@ const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) =
                 onclick: async () => {
                     console.log(state);
                     console.log("saving ", karpasEntity)
+                    let karpas = [];
                     if (!!karpasEntity?.karpas) {
+                        karpas = [
+                            ...(Karpas.entry.karpas ?? []),
+                        ];
+                        karpas[karpasIndex] = state
 
                     } else {
-                        const karpas = [
+                        karpas = [
                             ...(Karpas.entry.karpas ?? []),
-                             state
+                            state
                         ];
-
-                        await Karpas.save(karpas)
-
                     }
-                    const innerContainer = document.getElementById(`karpas-${side}-inner-container`);
-                    const existing = innerContainer[karpasIndex];
-                    if (existing) {
-                        existing.style.display = "block";
-                        container.remove();
-                    }
+                    await Karpas.save(karpas)
+
 
                 },
                 style: {
@@ -263,17 +276,14 @@ const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) =
             maxHeight: "4rem"
         }
     });
-    if (!karpasIndex) {
-        document.getElementById(`karpas-${side}-inner-container`).appendChild(container)
-    } else {
-        // I need to kind of delete or hide existing 
-        // and then insert this 
-        const innerContainer = document.getElementById(`karpas-${side}-inner-container`);
-        const existing = innerContainer[karpasIndex];
-        existing.style.display = "none";
-        innerContainer.insertBefore(container, existing.nextSibling)
-    }
-};
+
+    return container
+}
+
+const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) => {
+    const component = generateWriteKarpasEntity(side, karpasEntity, karpasIndex);
+    document.getElementById(`karpas-${side}-inner-container`).appendChild(component)
+}
 
 const renderKarpas = () => {
     const [leftContainer, rightContainer] = [
@@ -285,8 +295,6 @@ const renderKarpas = () => {
         generateAddKarpasEntity(SIDES.LEFT),
         generateAddKarpasEntity(SIDES.RIGHT)
     ];
-
-
 
     // handle fetching and splitting of entities according to side.
     const [leftExistingChildren, rightExistingChildren] = [
@@ -301,7 +309,8 @@ const renderKarpas = () => {
                 width: "100%",
                 maxHeight: "90%",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                overflow: "scroll"
             },
             children: leftExistingChildren,
         }),
@@ -321,9 +330,21 @@ const renderKarpas = () => {
 
     rightContainer.appendChild(rightInnerContainer);
     rightContainer.appendChild(rightAddContainer);
+    Karpas.elements = {
+        leftInnerContainer,
+        leftAddContainer,
+        rightInnerContainer,
+        rightAddContainer
+    }
+
+
 }
 const Karpas = {
     entry: {},
+    elements: {
+        leftContainer: null,
+        rightContainer: null
+    },
     save: async (karpas) => {
         console.log(Karpas.entry)
         console.log(karpas)
@@ -333,9 +354,19 @@ const Karpas = {
             karpas,
         })
         Karpas.entry.karpas = karpas;
+        Karpas.reRender()
 
         console.log("result....")
         console.log(karpas)
+    },
+    reRender: (result) => {
+        Object.values(Karpas.elements).map(element => element.remove())
+        // Karpas.elements.leftContainer.remove()
+        // Karpas.elements.rightContainer.remove()
+        Karpas.render()
+    },
+    render: () => {
+        renderKarpas()
     }
 }
 

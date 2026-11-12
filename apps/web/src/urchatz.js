@@ -124,7 +124,7 @@ const renderOuterCourtyard = () => {
             style: {
                 height: "100%",
                 width: "20rem",
-                border: "1px solid purple",
+                border: "1px solid #ed143d40",
                 overflow: "scroll"
             }
         }),
@@ -134,7 +134,7 @@ const renderOuterCourtyard = () => {
             style: {
                 height: "100%",
                 width: "20rem",
-                border: "1px solid purple",
+                border: "1px solid #ed143d40",
             }
         }),
     ]

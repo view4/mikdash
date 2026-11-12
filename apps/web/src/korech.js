@@ -394,14 +394,14 @@ const Korech = {
             setAltarValues();
             setKadeshHeaderText();
         });
-        const kadeshContainer = document.getElementById("kadesh-page-container");
-        kadeshContainer.remove();
+        // const kadeshContainer = document.getElementById("kadesh-page-container");
+        // kadeshContainer.remove();
         root.appendChild(container);
 
     }
 }
 
-document.addEventListener("rachtzah-entered", (event) => {
+document.addEventListener("to-inner-courtyard", (event) => {
     const kadeshId = event.detail.kadeshId;
     Korech.render(kadeshId);
 });

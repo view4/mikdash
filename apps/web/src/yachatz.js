@@ -38,7 +38,10 @@ const tabs = (items, onChange, style = {}) => {
         })),
         style: {
             border: "1px solid lightgrey",
-            display: "flex"
+            display: "flex",
+            overflow: "hidden",
+            height: "1.5rem",
+            borderRadius: "1rem"
         }
     })
     return container
@@ -81,7 +84,6 @@ const generateAddYachatzEntity = (side) => {
                     },
                     text: "+",
                     onclick: () => {
-                        console.log("handle on press here..")
                         appendCreateYachatzEntity(side);
                     }
                 }
@@ -147,9 +149,8 @@ const generateYachatzEntity = (entity, index) => {
                             text: "edit",
                             style: {
                                 background: "white",
-                                borderRadius: "0.25rem",
-                                padding: "0.25rem 0.5rem",
-                                fontSize: "0.75rem",
+                                borderRadius: "1rem",
+                                padding: "0.25rem 0.75rem",                                fontSize: "0.75rem",
                                 border: "1px solid lightblue"
 
                             },
@@ -207,7 +208,6 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                 // value: 
                 onchange: (e) => {
                     state.yachatz = e.target.value
-                    console.log('handle on change here...')
                 },
                 attributes: {
                     placeholder: "Established Practice",
@@ -246,7 +246,6 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                             // value: detail,
                             onchange: (e) => {
                                 state.details[index] = e.target.value
-                                console.log("handle onblur here...! ")
                                 if (!e.target.value.length) return null;
                                 e.target.parentElement.parentElement.appendChild(generateDetailInputItem("", index + 1))
                             },
@@ -272,7 +271,6 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
             minHeight: "5rem",
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end",
             overflow: "scroll"
         },
         children: [
@@ -286,7 +284,6 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
             seed("button", {
                 text: "append",
                 onclick: () => {
-                    console.log(detailsContainer.children[0])
                     detailsContainer.children[0].appendChild(generateDetailInputItem("", state.details.length + 1))
                 },
                 style: {
@@ -298,8 +295,8 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                     cursor: "pointer",
                     fontSize: "0.75rem",
                     border: "1px dotted lightblue",
-                    width: "fit-content"
-
+                    width: "fit-content",
+                    alignSelf: "flex-end"
                 }
             })
 
@@ -332,11 +329,9 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
             seed("button", {
                 text: "save",
                 onclick: async () => {
-                    console.log(state);
-                    console.log("saving ", yachatzEntity)
                     state.details = state.details.filter(detail => !!detail?.trim()?.length)
                     let yachatz = [];
-                    if (!state?.karpas?.trim()?.length) return null;
+                    if (!state?.yachatz?.trim()?.length) return null;
                     if (!!yachatzEntity?.yachatz) {
                         yachatz = [
                             ...(Yachatz.entry.yachatz ?? []),
@@ -463,8 +458,6 @@ const Yachatz = {
         rightContainer: null
     },
     save: async (yachatz) => {
-        console.log(Yachatz.entry)
-        console.log(yachatz)
         const res = await requests.write({
             kadeshId: Yachatz.entry?.kadeshId,
             entryId: Yachatz.entry?.entryId,
@@ -473,13 +466,9 @@ const Yachatz = {
         Yachatz.entry.yachatz = yachatz;
         Yachatz.reRender()
 
-        console.log("result....")
-        console.log(yachatz)
     },
     reRender: (result) => {
         Object.values(Yachatz.elements).map(element => element.remove())
-        // Yachatz.elements.leftContainer.remove()
-        // Yachatz.elements.rightContainer.remove()
         Yachatz.render()
     },
     render: () => {
@@ -492,15 +481,13 @@ const fetchExistingEntry = async (kadeshId, entryId) => {
     const data = await requests.fetch(kadeshId);
     const existingEntry = data.entries?.filter(entry => (entry.entryId === entryId) && entry)[0]
 
-    return existingEntry
+    return existingEntry ?? {};
 };
 
 document.addEventListener("to-outer-courtyard", async (event) => {
-    console.log(event.detail)
     Yachatz.entry = event.detail.entry;
     Yachatz.entry = await fetchExistingEntry(event.detail.entry?.kadeshId, event.detail?.entry?.entryId);
     Yachatz.entry.kadeshId = event.detail.entry?.kadeshId
-    console.log(Yachatz.entry)
 
     renderYachatz()
 
@@ -512,8 +499,6 @@ document.addEventListener("toggle-karpas-yachatz", (e) => {
     const value = e.detail.value;
 
     if (value === "yachatz" && document.getElementById(`yachatz-${side}-container`).style.display === "none") {
-        // handle toggle here...!
-        console.log("inside toggle")
         document.getElementById(`yachatz-${side}-container`).style.display = "block"
         document.getElementById(`karpas-${side}-container`).style.display = "none";
     }

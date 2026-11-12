@@ -15,7 +15,6 @@ export class KeyRouteHandler {
     }
 
     async read(payload, context) {
-        console.log("read payload....", payload)
         if (this.resolvers.read) return this.resolvers.read(payload, context);
         return null;
     }

@@ -57,7 +57,6 @@ const handleSubmit = () => {
                 feed: [...state.kadesh.feed, res]
             }
         })
-        console.log(Kadesh)
         const event = new CustomEvent("kadesh-entered", { detail: { kadeshId: res.id, direction: Kadesh.direction} });
         document.dispatchEvent(event);
     }).catch((err) => {
@@ -284,7 +283,6 @@ const defaultTabs = [{ text: "N", value: DIRECTIONS.NORTH }, { text: "E", value:
 
 const onTabSelect = (item) => {
     Kadesh.direction = item.value;
-    console.log(item.value)
     const event = new CustomEvent("set-kadesh-direction", {
         detail: {
             value: item.value
@@ -315,7 +313,6 @@ const reRenderTabs = (activeValue) => {
 }
 
 document.addEventListener("set-kadesh-direction", (e) => {
-    console.log(e.detail.value)
     reRenderTabs(e.detail.value)
 
 })

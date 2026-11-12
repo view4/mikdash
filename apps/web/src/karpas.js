@@ -38,7 +38,10 @@ const tabs = (items, onChange, style = {}) => {
         })),
         style: {
             border: "1px solid lightgrey",
-            display: "flex"
+            display: "flex",
+            overflow: "hidden",
+            height: "1.5rem",
+            borderRadius: "1rem"
         }
     })
     return container
@@ -81,7 +84,6 @@ const generateAddKarpasEntity = (side) => {
                     },
                     text: "+",
                     onclick: () => {
-                        console.log("handle on press here..")
                         appendCreateKarpasEntity(side);
                     }
                 }
@@ -148,8 +150,8 @@ const generateKarpasEntity = (entity, index) => {
                             text: "edit",
                             style: {
                                 background: "white",
-                                borderRadius: "0.25rem",
-                                padding: "0.25rem 0.5rem",
+                                borderRadius: "1rem",
+                                padding: "0.25rem 0.75rem",
                                 fontSize: "0.75rem",
                                 border: "1px solid lightblue"
 
@@ -208,7 +210,6 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
                 // value: 
                 onchange: (e) => {
                     state.karpas = e.target.value
-                    console.log('handle on change here...')
                 },
                 attributes: {
                     placeholder: "Established Practice",
@@ -245,7 +246,6 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
                         {
                             onchange: (e) => {
                                 state.details[index] = e.target.value
-                                console.log("handle onblur here...! ")
                             },
                             attributes: {
                                 placeholder: "Detail",
@@ -272,7 +272,7 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
             minHeight: "5rem",
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end",
+            // alignItems: "flex-end",
             overflow: "scroll"
         },
         children: [
@@ -285,7 +285,6 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
             seed("button", {
                 text: "append",
                 onclick: () => {
-                    console.log(detailsContainer.children[0])
                     detailsContainer.children[0].appendChild(generateDetailInputItem("", state.details.length + 1))
                 },
                 style: {
@@ -298,7 +297,7 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
                     fontSize: "0.75rem",
                     border: "1px dotted lightblue",
                     width: "fit-content",
-
+                    alignSelf: "flex-end"
                 }
             })
         ],
@@ -330,8 +329,6 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
             seed("button", {
                 text: "save",
                 onclick: async () => {
-                    console.log(state);
-                    console.log("saving ", karpasEntity)
                     state.details = state.details.filter(detail => !!detail?.trim()?.length)
                     let karpas = [];
                     if (!state?.karpas?.trim()?.length) return null;
@@ -484,7 +481,7 @@ const fetchExistingEntry = async (kadeshId, entryId) => {
     const data = await requests.fetch(kadeshId);
     const existingEntry = data.entries?.filter(entry => (entry.entryId === entryId) && entry)[0]
 
-    return existingEntry
+    return existingEntry ?? {};
 };
 
 document.addEventListener("to-outer-courtyard", async (event) => {
@@ -500,7 +497,6 @@ document.addEventListener("to-outer-courtyard", async (event) => {
 document.addEventListener("toggle-karpas-yachatz", (e) => {
     const side = e.detail.side;
     const value = e.detail.value;
-    console.log(e.detail)
 
     if (value === "karpas" && document.getElementById(`karpas-${side}-container`).style.display === "none") {
         document.getElementById(`yachatz-${side}-container`).style.display = "none"

@@ -89,7 +89,6 @@ export class KadeshUrchatz extends Document {
     };
 
     async update(data) {
-        console.log("inside update!! ")
         // data includes - kadeshId, partial data of entry, entryId, and optionally the direction too
         const kadeshId = data.kadeshId;
         const entryId = data.entryId;
@@ -97,20 +96,17 @@ export class KadeshUrchatz extends Document {
         const document = await this.read(kadeshId);
 
         if (!document || !document?.entries?.length) {
-            console.log("something here... ")
-
+            console.log("document is empty or invalid")
+            return null;
         };
 
         let existingEntryIndex = null;
 
         document.entries.map((entry, index) => {
             if (entry.entryId === entryId) {
-                // con
                 existingEntryIndex = index;
             }
         });
-
-        console.log(existingEntryIndex)
 
         delete data["kadeshId"];
         delete data["entryId"]
@@ -125,10 +121,6 @@ export class KadeshUrchatz extends Document {
 
         document.entries[existingEntryIndex] = updatedEntryData;
         document.updatedAt = now;
-
-        console.log(JSON.stringify(document));
-
-
 
         const filePath = this._filePath(kadeshId);
         await fs.writeFile(filePath, JSON.stringify(document, null, 2), "utf-8");

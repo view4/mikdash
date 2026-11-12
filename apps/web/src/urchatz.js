@@ -78,24 +78,20 @@ const renderUrchatz = () => {
         text: "Enter",
         onclick: async () => {
             let entryId = Urchatz.entryId;
-            console.log(entryId)
             const res = await requests.write({
                 kadeshId: Urchatz.kadeshId,
                 direction: Urchatz.direction,
                 entryId,
                 urchatz: portal.value
             });
-            console.log("...")
-            console.log(res)
             if (!entryId) {
                 const existingEntry = await fetchExistingEntry(Urchatz.kadeshId);
-                Urchatz.entryId = existingEntry.id;
+                Urchatz.entryId = existingEntry.entryId;
                 Urchatz.entry = existingEntry;
             }
             // perhaps unify into a single handleTransition handler or emit an event - whichever feels suitable there - thanks. 
             Urchatz.unrender()
             Urchatz.renderOuterCourtyard()
-
         }
     })
 }
@@ -106,10 +102,9 @@ const renderOuterCourtyard = () => {
             height: "100vh",
             width: "100vw",
             display: "flex"
-
-
         },
         parent: root,
+        id: "outer-courtyard-container"
     });
 
     const kadeshContainer = seed("div", {
@@ -123,7 +118,7 @@ const renderOuterCourtyard = () => {
             id: "karpas-left-container",
             style: {
                 height: "100%",
-                width: "20rem",
+                width: "36rem",
                 border: "1px solid #ed143d40",
                 overflow: "scroll",
                 display: "flex",
@@ -136,7 +131,7 @@ const renderOuterCourtyard = () => {
             id: "karpas-right-container",
             style: {
                 height: "100%",
-                width: "20rem",
+                width: "36rem",
                 border: "1px solid #ed143d40",
                 overflow: "scroll",
                 display: "flex",
@@ -152,7 +147,7 @@ const renderOuterCourtyard = () => {
             style: {
                 display: "none",
                 height: "100%",
-                width: "20rem",
+                width: "36rem",
                 border: "1px solid lightblue",
 
             }
@@ -163,16 +158,18 @@ const renderOuterCourtyard = () => {
             style: {
                 display: "none",
                 height: "100%",
-                width: "20rem",
+                width: "36rem",
                 border: "1px solid lightblue",
             }
         })
     ]
     const maggidContainer = seed("div", {
-        text: "maggid",
+        id: "maggid-container",
         style: {
             height: "100%",
             width: "-webkit-fill-available",
+            position: "relative",
+            overflow: "hidden"
         }
     });
 
@@ -229,7 +226,6 @@ const fetchExistingEntry = async (kadeshId) => {
 
 const onLoad = async (kadeshId) => {
     const existingEntry = await fetchExistingEntry(kadeshId);
-    console.log({existingEntry})
     if (!existingEntry) return null;
     document.getElementById("urchatz-portal").value = existingEntry.urchatz
     Urchatz.value = existingEntry?.urchatz;
@@ -240,7 +236,6 @@ document.addEventListener("kadesh-entered", (event) => {
     const kadeshId = event.detail.kadeshId;
     const direction = event.detail.direction;
     Urchatz.direction = direction
-    console.log({direction})
     onLoad(kadeshId);
     Urchatz.render(kadeshId);
 });

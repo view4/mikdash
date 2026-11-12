@@ -20,7 +20,6 @@ const requests = {
 const root = document.getElementById("root");
 
 const renderUrchatz = () => {
-    renderOuterCourtyard();
 
     const container = seed("div", {
         id: "urchatz-container",
@@ -65,8 +64,6 @@ const renderUrchatz = () => {
     const button = seed("button", {
         style: {
             position: "absolute",
-            // bottom: "6rem",
-            // right: "6rem",
             bottom: "10%",
             right: "10%",
             background: "white",
@@ -79,14 +76,26 @@ const renderUrchatz = () => {
         },
         parent: container,
         text: "Enter",
-        onclick: () => {
-            requests.write({
+        onclick: async () => {
+            let entryId = Urchatz.entryId;
+            console.log(entryId)
+            const res = await requests.write({
                 kadeshId: Urchatz.kadeshId,
                 direction: Urchatz.direction,
-                entryId: Urchatz.entryId,
+                entryId,
                 urchatz: portal.value
-            })
+            });
+            console.log("...")
+            console.log(res)
+            if (!entryId) {
+                const existingEntry = await fetchExistingEntry(Urchatz.kadeshId);
+                Urchatz.entryId = existingEntry.id;
+                Urchatz.entry = existingEntry;
+            }
+            // perhaps unify into a single handleTransition handler or emit an event - whichever feels suitable there - thanks. 
             Urchatz.unrender()
+            Urchatz.renderOuterCourtyard()
+
         }
     })
 }
@@ -96,22 +105,74 @@ const renderOuterCourtyard = () => {
         style: {
             height: "100vh",
             width: "100vw",
-            display: "grid"
+            display: "flex"
+
+
         },
         parent: root,
-        text: "courtyard.."
     });
 
-    const kadeshContainer = seed("div", {});
+    const kadeshContainer = seed("div", {
+
+    });
+
     const karpasContainers = [
-        seed("div", {}),
-        seed("div", {}),
+        seed("div", {
+            parent: container,
+            // text: "left component",
+            id: "karpas-left-container",
+            style: {
+                height: "100%",
+                width: "20rem",
+                border: "1px solid purple",
+                overflow: "scroll"
+            }
+        }),
+        seed("div", {
+            parent: container,
+            id: "karpas-right-container",
+            style: {
+                height: "100%",
+                width: "20rem",
+                border: "1px solid purple",
+            }
+        }),
     ]
     const yachatzContainers = [
-        seed("div", {}),
-        seed("div", {})
+        seed("div", {
+            parent: container,
+            style: {
+                display: "none"
+            }
+        }),
+        seed("div", {
+            parent: container,
+            style: {
+                display: "none"
+            }
+        })
     ]
-    const maggidContainer = seed("div", {})
+    const maggidContainer = seed("div", {
+        text: "maggid",
+        style: {
+            height: "100%",
+            width: "-webkit-fill-available",
+        }
+    });
+
+    container.insertBefore(maggidContainer, karpasContainers[1]);
+
+    const event = new CustomEvent("to-outer-courtyard", {
+        detail: {
+            entry: {
+                ...Urchatz.entry,
+                entryId: Urchatz.entryId,
+                kadeshId: Urchatz.kadeshId
+            }
+        }
+    });
+
+    document.dispatchEvent(event)
 }
 
 const Urchatz = {
@@ -119,6 +180,7 @@ const Urchatz = {
     direction: "south", //temp default set...
     entryId: null,
     value: null,
+    entry: {},
     elements: {
         portal: null
     },
@@ -130,16 +192,24 @@ const Urchatz = {
     },
     unrender: () => {
         document.getElementById("urchatz-container").remove();
+    },
+    renderOuterCourtyard: () => {
+        renderOuterCourtyard();
     }
 }
-
-const onLoad = async (kadeshId) => {
+const fetchExistingEntry = async (kadeshId) => {
     const data = await requests.fetch(kadeshId);
     const existingEntry = data.entries?.filter(entry => (entry.direction === Urchatz.direction) && entry)[0]
+    return existingEntry
+}
+
+
+const onLoad = async (kadeshId) => {
+    const existingEntry = await fetchExistingEntry(kadeshId)
     if (!existingEntry) return null;
-    Urchatz.entryId;
     document.getElementById("urchatz-portal").value = existingEntry.urchatz
-    Urchatz.value = existingEntry.urchatz
+    Urchatz.value = existingEntry?.urchatz;
+    Urchatz.entryId = existingEntry?.entryId;
 }
 
 document.addEventListener("kadesh-entered", (event) => {
@@ -147,3 +217,8 @@ document.addEventListener("kadesh-entered", (event) => {
     onLoad(kadeshId);
     Urchatz.render(kadeshId);
 });
+
+
+
+
+

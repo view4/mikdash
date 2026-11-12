@@ -16,7 +16,13 @@ export class KadeshUrchatz extends Document {
                     {
                         "direction": "string",
                         "urchatz"/* aka intention */: "string",
-                        "karpas": ["string"],
+                        "karpas": [
+                            {
+                                "karpas": "string",
+                                "details": ["string"],
+                                "side": "string"
+                            }
+                        ],
                         "yachatz": ["string"],
                         "maggid": "string",
                         "rachtzah": "string",
@@ -28,12 +34,13 @@ export class KadeshUrchatz extends Document {
     }
 
     async write(data) {
+        console.log("inside write..")
+        console.log(data)
         if (!data.entryId) return this.create(data)
         if (data.entryId) return this.update(data);
     }
 
     async generate(kadeshId, data) {
-        console.log("data, ..",data)
         const filePath = this._filePath(kadeshId);
         const document = {
             id: crypto.randomUUID(),
@@ -52,10 +59,10 @@ export class KadeshUrchatz extends Document {
 
 
     async create(data) {
-        console.log("create...", data)
         const kadeshId = data.kadeshId;
         const existingFile = await this.read(kadeshId);
         if (!existingFile) return this.generate(kadeshId, data);
+        const now = new Date().toISOString();
         const document = {
             ...existingFile,
             entries: [
@@ -64,9 +71,12 @@ export class KadeshUrchatz extends Document {
                     urchatz: data.urchatz,
                     entryId: crypto.randomUUID(),
                     direction: data.direction,
-                    createdAt: new Date().toISOString()
+                    createdAt: now,
                 }
-            ]
+            ],
+            createdAt: now,
+            updatedAt: now,
+
         };
         const filePath = this._filePath(kadeshId);
         await fs.writeFile(filePath, JSON.stringify(document, null, 2), "utf-8");
@@ -75,6 +85,67 @@ export class KadeshUrchatz extends Document {
     };
 
     async update(data) {
+        console.log("inside update!! ")
         // data includes - kadeshId, partial data of entry, entryId, and optionally the direction too
+        const kadeshId = data.kadeshId;
+        const entryId = data.entryId;
+
+        const document = await this.read(kadeshId);
+
+        if (!document || !document?.entries?.length)  {
+            console.log("something here... ")
+            
+        };
+
+        let existingEntryIndex = null;
+
+        document.entries.map((entry, index) => {
+            if (entry.entryId === entryId) {
+                // con
+                existingEntryIndex = index;
+            }
+        });
+
+        console.log(existingEntryIndex)
+
+        delete data["kadeshId"];
+        delete data["entryId"]
+
+        const updatedEntryData = {
+            ...document.entries[existingEntryIndex],
+            ...data
+        };
+
+        const now = new Date().toISOString();
+
+
+        document.entries[existingEntryIndex] = updatedEntryData;
+        document.updatedAt = now;
+
+        console.log(JSON.stringify(document));
+
+
+
+        const filePath = this._filePath(kadeshId);
+        await fs.writeFile(filePath, JSON.stringify(document, null, 2), "utf-8");
+
+        return document
+
     }
+
+    // async write(data) {
+    //     await this._ensureDir();
+    //     const id = data.id ?? crypto.randomUUID();
+    //     const now = new Date().toISOString();
+    //     const doc = {
+    //         ...data,
+    //         id,
+    //         createdAt: data.createdAt ?? now,
+    //         updatedAt: data.updatedAt ?? now,
+    //     };
+    //     const filePath = this._filePath(id);
+    //     await fs.writeFile(filePath, JSON.stringify(doc, null, 2), "utf-8");
+    //     return doc;
+    // }
+
 }

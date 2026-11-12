@@ -46,7 +46,7 @@ const tabs = (items, onChange, style = {}) => {
 
 const generateTabs = (side) => {
     return tabs(
-        [{ text: "karpas"}, { text: "yachatz", active: true }],
+        [{ text: "karpas" }, { text: "yachatz", active: true }],
         (item) => {
             const event = new CustomEvent("toggle-karpas-yachatz", {
                 detail: {
@@ -96,7 +96,11 @@ const generateAddYachatzEntity = (side) => {
 };
 
 const generateYachatzEntity = (entity, index) => {
-    const editEntityComponent = generateWriteYachatzEntity(entity.side, entity, index);
+    const onCancel = () => {
+        editEntityComponent.style.display = "none";
+        component.style.display = "block"
+    }
+    const editEntityComponent = generateWriteYachatzEntity(entity.side, entity, index, onCancel);
     editEntityComponent.style.display = "none";
     const component = seed(
         "div",
@@ -176,7 +180,7 @@ const generateExistingYachatzEntities = (entities) => {
     ]), [])
 }
 
-const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null) => {
+const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null, onCancel = null) => {
     // RENAME accordingly or create a singule kind of logic and handle accordingly please
     const state = {
         side,
@@ -190,9 +194,9 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
             borderRadius: "0.5rem",
             margin: "0.5rem auto",
             width: "90%",
-            maxHeight: "20rem",
+            maxHeight: "30rem",
             overflow: "scroll",
-            minHeight: "10rem"
+            minHeight: "20rem"
         }
     });
 
@@ -209,6 +213,12 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                     placeholder: "Established Practice",
                     value: yachatzEntity?.yachatz ?? "",
 
+                },
+                style: {
+                    fontSize: "1.125rem",
+                    maxWidth: "90%",
+                    maxHeight: "75%",
+                    fontWeight: 500
                 }
             })
         ],
@@ -216,7 +226,10 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
         style: {
             margin: "0.5rem",
             height: "25%",
-            maxHeight: "4rem"
+            maxHeight: "4rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
         },
 
     })
@@ -256,7 +269,11 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
     const detailsContainer = seed("div", {
         style: {
             height: "50%",
-            minHeight: "5rem"
+            minHeight: "5rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            overflow: "scroll"
         },
         children: [
             seed("ul", {
@@ -265,7 +282,27 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
 
                 },
                 children: state.details.map((detail, index) => generateDetailInputItem(detail, index))
+            }),
+            seed("button", {
+                text: "append",
+                onclick: () => {
+                    console.log(detailsContainer.children[0])
+                    detailsContainer.children[0].appendChild(generateDetailInputItem("", state.details.length + 1))
+                },
+                style: {
+                    background: "white",
+                    margin: "0rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.75rem",
+                    border: "1px dotted lightblue",
+                    width: "fit-content"
+
+                }
             })
+
         ],
         parent: container
     });
@@ -273,11 +310,33 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
     const saveContainer = seed("div", {
         children: [
             seed("button", {
+                text: "cancel",
+                onclick: () => {
+                    if (!!karpasEntity.karpas) {
+                        onCancel?.()
+                    } else {
+                        container.remove();
+                    }
+                },
+                style: {
+                    background: "white",
+                    margin: "0rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    border: "1px dotted crimson"
+                },
+            }),
+            seed("button", {
                 text: "save",
                 onclick: async () => {
                     console.log(state);
                     console.log("saving ", yachatzEntity)
+                    state.details = state.details.filter(detail => !!detail?.trim()?.length)
                     let yachatz = [];
+                    if (!state?.karpas?.trim()?.length) return null;
                     if (!!yachatzEntity?.yachatz) {
                         yachatz = [
                             ...(Yachatz.entry.yachatz ?? []),
@@ -297,7 +356,9 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                 style: {
                     background: "white",
                     borderRadius: "0.25rem",
-                    padding: "0.25rem 0.5rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
+                    cursor: "pointer",
                     fontSize: "0.75rem",
                     border: "1px solid lightblue"
                 },
@@ -316,8 +377,8 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
     return container
 }
 
-const appendCreateYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null) => {
-    const component = generateWriteYachatzEntity(side, yachatzEntity, yachatzIndex);
+const appendCreateYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null, onCancel = null) => {
+    const component = generateWriteYachatzEntity(side, yachatzEntity, yachatzIndex, onCancel);
     document.getElementById(`yachatz-${side}-inner-container`).appendChild(component)
 }
 
@@ -430,9 +491,7 @@ const Yachatz = {
 const fetchExistingEntry = async (kadeshId, entryId) => {
     const data = await requests.fetch(kadeshId);
     const existingEntry = data.entries?.filter(entry => (entry.entryId === entryId) && entry)[0]
-    console.log({
-        entryId, kadeshId
-    }, existingEntry)
+
     return existingEntry
 };
 

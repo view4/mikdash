@@ -97,7 +97,11 @@ const generateAddKarpasEntity = (side) => {
 };
 
 const generateKarpasEntity = (entity, index) => {
-    const editEntityComponent = generateWriteKarpasEntity(entity.side, entity, index);
+    const onCancel = () => {
+        editEntityComponent.style.display = "none";
+        component.style.display = "block"
+    }
+    const editEntityComponent = generateWriteKarpasEntity(entity.side, entity, index, onCancel);
     editEntityComponent.style.display = "none";
     const component = seed(
         "div",
@@ -177,7 +181,7 @@ const generateExistingKarpasEntities = (entities) => {
     ]), [])
 }
 
-const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) => {
+const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, onCancel = null) => {
     // RENAME accordingly or create a singule kind of logic and handle accordingly please
     const state = {
         side,
@@ -191,9 +195,9 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
             borderRadius: "0.5rem",
             margin: "0.5rem auto",
             width: "90%",
-            maxHeight: "20rem",
+            maxHeight: "30rem",
             overflow: "scroll",
-            minHeight: "10rem"
+            minHeight: "20rem"
         }
     });
 
@@ -210,6 +214,12 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
                     placeholder: "Established Practice",
                     value: karpasEntity?.karpas ?? "",
 
+                },
+                style: {
+                    fontSize: "1.125rem",
+                    maxWidth: "90%",
+                    maxHeight: "75%",
+                    fontWeight: 500
                 }
             })
         ],
@@ -217,7 +227,10 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
         style: {
             margin: "0.5rem",
             height: "25%",
-            maxHeight: "4rem"
+            maxHeight: "4rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
         },
 
     })
@@ -230,18 +243,17 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
                     seed(
                         "input",
                         {
-                            id: "karpas-detail-input-" + (index + 1),
-                            // value: detail,
                             onchange: (e) => {
                                 state.details[index] = e.target.value
                                 console.log("handle onblur here...! ")
-                                if (!e.target.value.length) return null;
-                                e.target.parentElement.parentElement.appendChild(generateDetailInputItem("", index + 1))
                             },
                             attributes: {
                                 placeholder: "Detail",
                                 value: detail ?? ""
                             },
+                            style: {
+
+                            }
                         }
                     )
                 ],
@@ -257,15 +269,37 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
     const detailsContainer = seed("div", {
         style: {
             height: "50%",
-            minHeight: "5rem"
+            minHeight: "5rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            overflow: "scroll"
         },
         children: [
             seed("ul", {
                 style: {
                     padding: "0rem 0.5rem"
-
                 },
                 children: state.details.map((detail, index) => generateDetailInputItem(detail, index))
+            }),
+            seed("button", {
+                text: "append",
+                onclick: () => {
+                    console.log(detailsContainer.children[0])
+                    detailsContainer.children[0].appendChild(generateDetailInputItem("", state.details.length + 1))
+                },
+                style: {
+                    background: "white",
+                    margin: "0rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.75rem",
+                    border: "1px dotted lightblue",
+                    width: "fit-content",
+
+                }
             })
         ],
         parent: container
@@ -274,11 +308,33 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
     const saveContainer = seed("div", {
         children: [
             seed("button", {
+                text: "cancel",
+                onclick: () => {
+                    if (!!karpasEntity.karpas) {
+                        onCancel?.()
+                    } else {
+                        container.remove();
+                    }
+                },
+                style: {
+                    background: "white",
+                    margin: "0rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    padding: "0.25rem 0.75rem",
+                    height: "1.5rem",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    border: "1px dotted crimson"
+                },
+            }),
+            seed("button", {
                 text: "save",
                 onclick: async () => {
                     console.log(state);
                     console.log("saving ", karpasEntity)
+                    state.details = state.details.filter(detail => !!detail?.trim()?.length)
                     let karpas = [];
+                    if (!state?.karpas?.trim()?.length) return null;
                     if (!!karpasEntity?.karpas) {
                         karpas = [
                             ...(Karpas.entry.karpas ?? []),
@@ -300,8 +356,10 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
                     borderRadius: "0.25rem",
                     padding: "0.25rem 0.75rem",
                     height: "1.5rem",
+                    cursor: "pointer",
                     fontSize: "0.75rem",
-                    border: "1px solid lightblue"
+                    border: "1px solid lightblue",
+                    alignItems: "flex-end"
                 },
             })
         ],
@@ -318,8 +376,8 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) 
     return container
 }
 
-const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null) => {
-    const component = generateWriteKarpasEntity(side, karpasEntity, karpasIndex);
+const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, onCancel = null) => {
+    const component = generateWriteKarpasEntity(side, karpasEntity, karpasIndex, onCancel);
     document.getElementById(`karpas-${side}-inner-container`).appendChild(component)
 }
 
@@ -403,8 +461,6 @@ const Karpas = {
         rightContainer: null
     },
     save: async (karpas) => {
-        console.log(Karpas.entry)
-        console.log(karpas)
         const res = await requests.write({
             kadeshId: Karpas.entry?.kadeshId,
             entryId: Karpas.entry?.entryId,
@@ -413,8 +469,6 @@ const Karpas = {
         Karpas.entry.karpas = karpas;
         Karpas.reRender()
 
-        console.log("result....")
-        console.log(karpas)
     },
     reRender: (result) => {
         Object.values(Karpas.elements).map(element => element.remove())
@@ -429,18 +483,14 @@ const Karpas = {
 const fetchExistingEntry = async (kadeshId, entryId) => {
     const data = await requests.fetch(kadeshId);
     const existingEntry = data.entries?.filter(entry => (entry.entryId === entryId) && entry)[0]
-    console.log({
-        entryId, kadeshId
-    }, existingEntry)
+
     return existingEntry
 };
 
 document.addEventListener("to-outer-courtyard", async (event) => {
-    console.log(event.detail)
     Karpas.entry = event.detail.entry;
     Karpas.entry = await fetchExistingEntry(event.detail.entry?.kadeshId, event.detail?.entry?.entryId);
     Karpas.entry.kadeshId = event.detail.entry?.kadeshId
-    console.log(Karpas.entry)
 
     renderKarpas()
 

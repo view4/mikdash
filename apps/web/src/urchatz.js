@@ -200,7 +200,7 @@ const renderOuterCourtyard = () => {
 
 const Urchatz = {
     kadeshId: null,
-    direction: "south", //temp default set...
+    direction: null, //temp default set...
     entryId: null,
     value: null,
     entry: {},
@@ -228,7 +228,8 @@ const fetchExistingEntry = async (kadeshId) => {
 
 
 const onLoad = async (kadeshId) => {
-    const existingEntry = await fetchExistingEntry(kadeshId)
+    const existingEntry = await fetchExistingEntry(kadeshId);
+    console.log({existingEntry})
     if (!existingEntry) return null;
     document.getElementById("urchatz-portal").value = existingEntry.urchatz
     Urchatz.value = existingEntry?.urchatz;
@@ -237,6 +238,9 @@ const onLoad = async (kadeshId) => {
 
 document.addEventListener("kadesh-entered", (event) => {
     const kadeshId = event.detail.kadeshId;
+    const direction = event.detail.direction;
+    Urchatz.direction = direction
+    console.log({direction})
     onLoad(kadeshId);
     Urchatz.render(kadeshId);
 });

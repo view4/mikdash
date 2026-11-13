@@ -37,7 +37,6 @@ export const seed = (tag, { id, onclick, text, className, attributes = {}, child
     }
 
     if (onchange) {
-        console.log("setting onchange", onchange, tag)
         element.addEventListener('change', (e) => {
             onchange(e)
         })

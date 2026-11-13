@@ -23,8 +23,6 @@ export const readExamples = async () => {
         }
 
     });
-    console.log("res.....")
-    console.log(res)
     return res
 }
 

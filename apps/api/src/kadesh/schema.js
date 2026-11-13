@@ -26,7 +26,7 @@ export class Kadesh extends Document {
     }
 
     async updateMetadata(id, payload) {
-        const kadesh = await this.get(id);
+        const kadesh = await this.read(id);
         if (!kadesh) throw new Error("Kadesh not found");
         return this.update(id, {
             metadata: {

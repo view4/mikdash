@@ -2,11 +2,14 @@ import { Server, createKeyRouteDispatcher } from "@mikdash/server";
 import { exampleHandler } from "./example-handler.js";
 import { kadeshHandler } from "./kadesh/resolver.js"
 import { korechHandler } from "./korech/resolver.js"
+import { kadeshUrchatzHandler } from "./kadesh-urchatz/resolver.js"
 
-const handlerTree = { 
-  example: exampleHandler, 
+
+const handlerTree = {
+  example: exampleHandler,
   kadesh: kadeshHandler,
-  korech: korechHandler
+  korech: korechHandler,
+  ["kadesh-urchatz"]: kadeshUrchatzHandler,
 };
 
 const server = new Server({

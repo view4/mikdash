@@ -74,8 +74,10 @@ const onBack = () => {
     mutation((state) => {
         state.korech = null;
     });
-    const event = new CustomEvent("to-kadesh", { detail: {} });
-    document.dispatchEvent(event);
+    window.location.reload();
+
+    // const event = new CustomEvent("to-kadesh", { detail: {} });
+    // document.dispatchEvent(event);
 }
 
 const container = seed("div", {
@@ -394,14 +396,14 @@ const Korech = {
             setAltarValues();
             setKadeshHeaderText();
         });
-        const kadeshContainer = document.getElementById("kadesh-page-container");
-        kadeshContainer.remove();
+        // const kadeshContainer = document.getElementById("kadesh-page-container");
+        // kadeshContainer.remove();
         root.appendChild(container);
 
     }
 }
 
-document.addEventListener("kadesh-selected", (event) => {
+document.addEventListener("to-inner-courtyard", (event) => {
     const kadeshId = event.detail.kadeshId;
     Korech.render(kadeshId);
 });

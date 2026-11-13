@@ -57,8 +57,7 @@ const handleSubmit = () => {
                 feed: [...state.kadesh.feed, res]
             }
         })
-
-        const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: res.id } });
+        const event = new CustomEvent("kadesh-entered", { detail: { kadeshId: res.id, direction: Kadesh.direction} });
         document.dispatchEvent(event);
     }).catch((err) => {
         console.log("error....")
@@ -140,7 +139,7 @@ const renderListView = () => {
                             id: kadesh.id,
                         }
                     })
-                    const event = new CustomEvent("kadesh-selected", { detail: { kadeshId: kadesh.id } });
+                    const event = new CustomEvent("kadesh-entered", { detail: { kadeshId: kadesh.id, direction: Kadesh.direction } });
                     document.dispatchEvent(event);
                 }
             })
@@ -239,6 +238,85 @@ const render = async () => {
 
 render()
 
+const renderTabs = (items, onChange, style = {}, parent = null) => {
+    const container = seed("div", {
+        children: items.map((item, index) => seed("button", {
+            text: item.text,
+            onclick: (e) => onChange(item, index, e),
+            style: {
+                background: item.active ? "#add8e680" : "white",
+                border: "none",
+                fontWeight: item.active ? "bold" : "normal",
+                cursor: "pointer",
+                padding: "1rem",
+                flex: 1,
+                fontSize: "1.125rem",
+                borderRadius: "2rem"
+            }
+        })),
+        parent,
+        style: {
+            border: "1px solid lightgrey",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "absolute",
+            bottom: "5rem",
+            left: "5rem",
+            padding: "0rem",
+            borderRadius: "2rem",
+            border: "2px double lightblue",
+            height: "3rem",
+            overflow: "hidden"
+        }
+    })
+    return container
+}
+
+const DIRECTIONS = {
+    NORTH: "north",
+    EAST: "east",
+    SOUTH: "south"
+}
+
+const defaultTabs = [{ text: "N", value: DIRECTIONS.NORTH }, { text: "E", value: DIRECTIONS.EAST }, { text: "S", value: DIRECTIONS.SOUTH, active: true }];
+
+const onTabSelect = (item) => {
+    Kadesh.direction = item.value;
+    const event = new CustomEvent("set-kadesh-direction", {
+        detail: {
+            value: item.value
+        }
+    });
+    document.dispatchEvent(event);
+}
+let tabs = renderTabs(
+    defaultTabs,
+    onTabSelect,
+    {},
+    container
+
+);
+
+const reRenderTabs = (activeValue) => {
+    tabs.remove();
+    tabs = renderTabs(
+        defaultTabs.map((tab, index) => ({
+            ...tab,
+            active: tab.value === activeValue
+        })),
+        onTabSelect,
+        {},
+        container
+
+    );
+}
+
+document.addEventListener("set-kadesh-direction", (e) => {
+    reRenderTabs(e.detail.value)
+
+})
+
 document.addEventListener("to-kadesh", () => {
     // maybe handle in a more full-proof method at some point. 
     const korechPageContainer = document.getElementById("korech-page-container");
@@ -253,3 +331,8 @@ document.addEventListener("to-kadesh", () => {
     handleToggleListView();
     render();
 });
+
+
+const Kadesh = {
+    direction: DIRECTIONS.SOUTH
+};

@@ -74,8 +74,10 @@ const onBack = () => {
     mutation((state) => {
         state.korech = null;
     });
-    const event = new CustomEvent("to-kadesh", { detail: {} });
-    document.dispatchEvent(event);
+    window.location.reload();
+
+    // const event = new CustomEvent("to-kadesh", { detail: {} });
+    // document.dispatchEvent(event);
 }
 
 const container = seed("div", {

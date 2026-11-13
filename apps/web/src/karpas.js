@@ -98,12 +98,12 @@ const generateAddKarpasEntity = (side) => {
     return container;
 };
 
-const generateKarpasEntity = (entity, index) => {
+const generateKarpasEntity = (entity) => {
     const onCancel = () => {
         editEntityComponent.style.display = "none";
         component.style.display = "block"
     }
-    const editEntityComponent = generateWriteKarpasEntity(entity.side, entity, index, onCancel);
+    const editEntityComponent = generateWriteKarpasEntity(entity.side, entity, onCancel);
     editEntityComponent.style.display = "none";
     const component = seed(
         "div",
@@ -177,13 +177,13 @@ const generateKarpasEntity = (entity, index) => {
 }
 const generateExistingKarpasEntities = (entities) => {
     if (!entities) return [];
-    return entities.reduce((children, entity, index) => ([
+    return entities.reduce((children, entity) => ([
         ...children,
-        ...generateKarpasEntity(entity, index)
+        ...generateKarpasEntity(entity)
     ]), [])
 }
 
-const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, onCancel = null) => {
+const generateWriteKarpasEntity = (side, karpasEntity = {}, onCancel = null) => {
     // RENAME accordingly or create a singule kind of logic and handle accordingly please
     const state = {
         side,
@@ -272,7 +272,6 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
             minHeight: "5rem",
             display: "flex",
             flexDirection: "column",
-            // alignItems: "flex-end",
             overflow: "scroll"
         },
         children: [
@@ -333,11 +332,7 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
                     let karpas = [];
                     if (!state?.karpas?.trim()?.length) return null;
                     if (!!karpasEntity?.karpas) {
-                        karpas = [
-                            ...(Karpas.entry.karpas ?? []),
-                        ];
-                        karpas[karpasIndex] = state
-
+                        karpas = Karpas.entry?.karpas.map(karpas => karpas?.karpas === karpasEntity?.karpas ? state : karpas)
                     } else {
                         karpas = [
                             ...(Karpas.entry.karpas ?? []),
@@ -373,8 +368,8 @@ const generateWriteKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, 
     return container
 }
 
-const appendCreateKarpasEntity = (side, karpasEntity = {}, karpasIndex = null, onCancel = null) => {
-    const component = generateWriteKarpasEntity(side, karpasEntity, karpasIndex, onCancel);
+const appendCreateKarpasEntity = (side, karpasEntity = {}, onCancel = null) => {
+    const component = generateWriteKarpasEntity(side, karpasEntity,  onCancel);
     document.getElementById(`karpas-${side}-inner-container`).appendChild(component)
 }
 

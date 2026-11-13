@@ -102,7 +102,7 @@ const generateYachatzEntity = (entity, index) => {
         editEntityComponent.style.display = "none";
         component.style.display = "block"
     }
-    const editEntityComponent = generateWriteYachatzEntity(entity.side, entity, index, onCancel);
+    const editEntityComponent = generateWriteYachatzEntity(entity.side, entity, onCancel);
     editEntityComponent.style.display = "none";
     const component = seed(
         "div",
@@ -175,13 +175,13 @@ const generateYachatzEntity = (entity, index) => {
 }
 const generateExistingYachatzEntities = (entities) => {
     if (!entities) return [];
-    return entities.reduce((children, entity, index) => ([
+    return entities.reduce((children, entity) => ([
         ...children,
-        ...generateYachatzEntity(entity, index)
+        ...generateYachatzEntity(entity)
     ]), [])
 }
 
-const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null, onCancel = null) => {
+const generateWriteYachatzEntity = (side, yachatzEntity = {}, onCancel = null) => {
     // RENAME accordingly or create a singule kind of logic and handle accordingly please
     const state = {
         side,
@@ -333,11 +333,7 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
                     let yachatz = [];
                     if (!state?.yachatz?.trim()?.length) return null;
                     if (!!yachatzEntity?.yachatz) {
-                        yachatz = [
-                            ...(Yachatz.entry.yachatz ?? []),
-                        ];
-                        yachatz[yachatzIndex] = state
-
+                        yachatz = Yachatz.entry?.yachatz.map(yachatz => yachatz?.yachatz === yachatzEntity?.yachatz ? state : yachatz)
                     } else {
                         yachatz = [
                             ...(Yachatz.entry.yachatz ?? []),
@@ -372,8 +368,8 @@ const generateWriteYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = nul
     return container
 }
 
-const appendCreateYachatzEntity = (side, yachatzEntity = {}, yachatzIndex = null, onCancel = null) => {
-    const component = generateWriteYachatzEntity(side, yachatzEntity, yachatzIndex, onCancel);
+const appendCreateYachatzEntity = (side, yachatzEntity = {}, onCancel = null) => {
+    const component = generateWriteYachatzEntity(side, yachatzEntity, onCancel);
     document.getElementById(`yachatz-${side}-inner-container`).appendChild(component)
 }
 

@@ -129,19 +129,4 @@ export class KadeshUrchatz extends Document {
 
     }
 
-    // async write(data) {
-    //     await this._ensureDir();
-    //     const id = data.id ?? crypto.randomUUID();
-    //     const now = new Date().toISOString();
-    //     const doc = {
-    //         ...data,
-    //         id,
-    //         createdAt: data.createdAt ?? now,
-    //         updatedAt: data.updatedAt ?? now,
-    //     };
-    //     const filePath = this._filePath(id);
-    //     await fs.writeFile(filePath, JSON.stringify(doc, null, 2), "utf-8");
-    //     return doc;
-    // }
-
 }

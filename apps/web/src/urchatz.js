@@ -113,8 +113,6 @@ const renderOuterCourtyard = () => {
 
     const karpasContainers = [
         seed("div", {
-            // parent: container,
-            // text: "left component",
             id: "karpas-left-container",
             style: {
                 height: "100%",
@@ -127,7 +125,6 @@ const renderOuterCourtyard = () => {
             }
         }),
         seed("div", {
-            // parent: container,
             id: "karpas-right-container",
             style: {
                 height: "100%",
